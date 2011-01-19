@@ -1,0 +1,19 @@
+LOG_INFO 2011-01-18 17:02:44 [func:init_event()] [event.c:45] epoll_create success.[g_efd:4]
+LOG_INFO 2011-01-18 17:02:44 [func:create_server()] [net.c:181] create server sockfd success
+LOG_INFO 2011-01-18 17:02:44 [func:register_event()] [event.c:75] epoll_ctl EPOLL_CTL_ADD success.[g_efd:4] [fd:5]
+LOG_INFO 2011-01-18 17:02:44 [func:loop_event()] [event.c:121] enter loop_event success....
+LOG_INFO 2011-01-18 17:02:47 [func:local_server_handler()] [net.c:427] client 0.0.0.0 connect to local_server [clientfd:6]
+LOG_INFO 2011-01-18 17:02:47 [func:register_event()] [event.c:75] epoll_ctl EPOLL_CTL_ADD success.[g_efd:4] [fd:6]
+LOG_INFO 2011-01-18 17:02:47 [func:create_mapped_server()] [net.c:271] find_mapped_server = false [src_addr:10.60.1.92] [port:5910].
+LOG_INFO 2011-01-18 17:02:47 [func:create_server()] [net.c:181] create server sockfd success
+LOG_INFO 2011-01-18 17:02:47 [func:get_local_ip()] [net.c:89] [hostname:sim124]
+LOG_INFO 2011-01-18 17:02:47 [func:get_local_ip()] [net.c:105] local ip:10.60.1.124
+LOG_INFO 2011-01-18 17:02:47 [func:register_event()] [event.c:75] epoll_ctl EPOLL_CTL_ADD success.[g_efd:4] [fd:7]
+LOG_INFO 2011-01-18 17:02:47 [func:local_server_client_handler()] [net.c:383] send response to clientfd.[clientfd:6] [response_buf:0|10.60.1.124:5901]
+LOG_INFO 2011-01-18 17:02:47 [func:unregister_event()] [event.c:109] epoll_ctl EPOLL_CTL_DEL success.[fd:6]
+LOG_INFO 2011-01-18 17:02:47 [func:local_server_client_handler()] [net.c:347] close clientfd.[clientfd:6]
+LOG_INFO 2011-01-18 17:02:52 [func:mapped_server_handler()] [net.c:467] client 0.0.0.0 connect mapped_server [local_fd:6]
+LOG_INFO 2011-01-18 17:02:52 [func:connect_to()] [net.c:209] connecting server.[addr:10.60.1.92] [port:5910]
+LOG_INFO 2011-01-18 17:02:52 [func:connect_to()] [net.c:228] connect success.
+LOG_INFO 2011-01-18 17:02:52 [func:register_event()] [event.c:75] epoll_ctl EPOLL_CTL_ADD success.[g_efd:4] [fd:8]
+LOG_INFO 2011-01-18 17:02:52 [func:register_event()] [event.c:75] epoll_ctl EPOLL_CTL_ADD success.[g_efd:4] [fd:6]
