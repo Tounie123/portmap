@@ -24,7 +24,7 @@
 
 #define DEFAULT_TIMEOUT  -1
 
-#define DEFAULT_THREAD_NUM 1
+#define DEFAULT_THREAD_NUM 4
 
 int g_started = 0;
 
