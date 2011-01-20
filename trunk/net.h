@@ -51,7 +51,7 @@ struct mapped_pair
     int local_sockfd;  // client connect to dest address
     unsigned int send_bytes;
     unsigned int recv_bytes;
-    int used;  //active used=1
+    int ref;  //ref = 2
     struct mapped_server *ms;
 };
 

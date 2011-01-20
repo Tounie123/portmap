@@ -297,7 +297,13 @@ create_mapped_server(struct local_server *pls, const char *src_addr,
     pms->ls = pls;
     get_local_ip(pms->dest_addr);
     snprintf(mapped_res, INET_ADDRSTRLEN+10, "%s:%u", pms->dest_addr, listen_port);
-    register_event(ret, mapped_server_handler, pms);
+    ret = register_event(ret, mapped_server_handler, pms);
+
+    if (ret < 0) {
+        close(pms->sockfd);
+        free(pms);
+        return -1;
+    }
     
     //add to the s_ms_list
     list_add(&pms->ms_list, &s_ms_list);
@@ -312,11 +318,17 @@ destroy_mapped_pair(int fd, struct mapped_pair *pmp)
 {
     assert(pmp != NULL);
 
-    unregister_event(pmp->remote_sockfd);
-    unregister_event(pmp->local_sockfd);
-    close(pmp->remote_sockfd);
-    close(pmp->local_sockfd);
-    free(pmp);
+    unregister_event(fd);
+    //unregister_event(pmp->local_sockfd);
+    //close(pmp->remote_sockfd);
+    //close(pmp->local_sockfd);
+    close(fd);
+    pmp->ref -= 1;
+
+    if (pmp->ref == 0) {
+    
+        free(pmp);
+    }
     return 0;
 }
 
@@ -410,7 +422,7 @@ local_server_handler(int fd, int event, void *opaque)
     struct local_server *pls = (struct local_server *)opaque;
     struct sockaddr_in from_addr;
     socklen_t from_addr_len;
-    int clientfd;
+    int clientfd, ret;
     char str_ip[INET_ADDRSTRLEN];
 
     if (!(event & EPOLLIN)) return -1;
@@ -434,7 +446,13 @@ local_server_handler(int fd, int event, void *opaque)
     
     //set NONBLOCK
     set_nonblock(clientfd);
-    return register_event(clientfd, local_server_client_handler, pls);
+    ret = register_event(clientfd, local_server_client_handler, pls);
+
+    if (ret < 0) {
+        close(clientfd);
+        return -1;
+    }
+    return 0;
 }
 
 
@@ -488,20 +506,27 @@ mapped_server_handler(int fd, int event, void *opaque)
     pmp->local_sockfd  = local_fd;
     pmp->send_bytes    = 0;
     pmp->recv_bytes    = 0;
-    pmp->used          = 1;
+    pmp->ref           = 2;
     pmp->ms            = pms;
 
     set_nonblock(remote_fd);
     set_nonblock(local_fd);
     ret = register_event(remote_fd, mapped_pair_handler, pmp);
 
-    if (ret < 0)
+    if (ret < 0) {
+    
+        close(remote_fd); 
+        close(local_fd);
+        free(pmp);
         return -1;
+    }
     ret = register_event(local_fd, mapped_pair_handler, pmp);
 
     if (ret < 0) {
-    
         unregister_event(remote_fd);
+        close(remote_fd); 
+        close(local_fd);
+        free(pmp);
         return -1;
     }
     //increase send buffer
@@ -520,7 +545,12 @@ mapped_pair_handler(int fd, int event, void *opaque)
     int read_fd, write_fd; 
     int nrecv, nlen, nsend;
     char buffer[MAX_DATA_LEN] = {0}, *p;
-
+    
+    if (pmp->ref == 1) {
+    
+        destroy_mapped_pair(fd, pmp);
+        return -1;
+    }
     read_fd = fd;
     if (pmp->remote_sockfd == fd) {
     
@@ -547,7 +577,7 @@ mapped_pair_handler(int fd, int event, void *opaque)
         }
         else if (nrecv == 0) {
             
-            LOG_ERR("recv error.[errno:%d] [error:%s]", errno, strerror(errno));
+            LOG_INFO("sockfd closed.[sockfd:%d] [nrecv:%d] ", read_fd, nrecv);
             destroy_mapped_pair(read_fd, pmp);
             return -1;
         }
