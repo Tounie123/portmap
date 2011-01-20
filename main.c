@@ -10,6 +10,7 @@
 #include "net.h"
 #include "event.h"
 #include "log.h"
+#include "worker.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -22,6 +23,8 @@
 #define DEFAULT_LOG_FILE "portmap.log"
 
 #define DEFAULT_TIMEOUT  -1
+
+#define DEFAULT_THREAD_NUM 4
 
 int g_started = 0;
 
@@ -68,6 +71,8 @@ main(int argc, char **argv)
     
     }
 
+    g_started = 1;
+
     ret = init_local_server(port, DEFAULT_MAPPED_LOWER_PORT, DEFAULT_MAPPED_HIGH_PORT);
 
     if (ret < 0) {
@@ -75,8 +80,15 @@ main(int argc, char **argv)
         fprintf(stderr, "init_local_server error.");
         return -1;
     }
+    
+    
+    ret = init_worker(DEFAULT_THREAD_NUM);
+    if (ret < 0) {
+        fprintf(stderr, "init_worker error.");
+        return -1;
+    }
 
-    g_started = 1;
     loop_event(timeout);
+    
     return 0;
 }

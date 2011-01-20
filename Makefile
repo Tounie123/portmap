@@ -1,13 +1,13 @@
 CC=gcc
-CFLAGS=-g -Wall
+CFLAGS=-g -Wall -DDEBUG
 
 INCLUDE=-I./
 
-LIBS= -lm
+LIBS= -lpthread
 
 TARGET=portmap
 
-all:net.o log.o event.o main.o
+all:net.o log.o event.o worker.o main.o
 	$(CC) $(CFLAGS) $(INCLUDE) $(LIBS) $^ -o $(TARGET)
 
 %.o:%.c

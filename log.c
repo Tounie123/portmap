@@ -18,6 +18,7 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <time.h>
+#include <unistd.h>
 
 
 
@@ -26,6 +27,20 @@ int
 log_init(const char *log_file)
 {
     assert(log_file != NULL); 
+
+    int is_exist;
+    char old_file_name[200], *p;
+    time_t t;
+    struct tm *tt;
+    is_exist = access(log_file, R_OK);
+    if (is_exist == 0) {
+        p = old_file_name;
+        t = time(NULL); 
+        tt = localtime(&t);
+        snprintf(p, 100, "%s.", log_file);
+        strftime(p + strlen(log_file)+1, 100, "%Y-%m-%d-%H-%M-%S", tt);
+        rename(log_file, old_file_name);
+    }
     g_log_file = fopen(log_file, "w+"); 
 
     if (g_log_file == NULL) {
