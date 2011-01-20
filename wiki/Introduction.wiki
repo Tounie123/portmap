@@ -13,14 +13,20 @@ portmap 主要是作为各个机器间端口映射的工具
   * 使用简单，只需发送待映射的端口到守护进程，守护进程会返回映射后的端口，即可使用
 
 = Example =
-  * make 
-  * ./portmap  //启动进程
-  * cd test    修改test1.c中相关变量
+  # make 
+  # ./portmap  //启动进程
+  # cd test    修改test1.c中相关变量
    addr: portmap server的地址
    port: portmap server 的端口
    
    request:是需要映射的地址和端口
 
-  * make && ./test1
+  # make && ./test1
    正常情况下，会给你返回映射后的地址和端口
+{{{
 
+    const char *addr = "10.60.1.124";
+    unsigned int port = 5903;
+
+    const char *request = "10.60.1.124:5905";
+}}}
