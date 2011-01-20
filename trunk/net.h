@@ -13,6 +13,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 #include "list.h"
 #define MAX_PORT_NUM 65536
 #define MAX_REQ_SIZE 1024
@@ -53,6 +54,7 @@ struct mapped_pair
     unsigned int recv_bytes;
     int ref;  //ref = 2
     struct mapped_server *ms;
+    pthread_mutex_t mutex;
 };
 
 

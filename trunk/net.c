@@ -323,10 +323,12 @@ destroy_mapped_pair(int fd, struct mapped_pair *pmp)
     //close(pmp->remote_sockfd);
     //close(pmp->local_sockfd);
     close(fd);
+    pthread_mutex_lock(&pmp->mutex);
     pmp->ref -= 1;
+    pthread_mutex_unlock(&pmp->mutex);
 
     if (pmp->ref == 0) {
-    
+        pthread_mutex_destroy(&pmp->mutex); 
         free(pmp);
     }
     return 0;
@@ -533,7 +535,7 @@ mapped_server_handler(int fd, int event, void *opaque)
     //optlen = sizeof(sendbuffsize);
     //ret = setsockopt(local_fd, SOL_SOCKET, SO_SNDBUF, &sendbuffsize, optlen);
     //ret = setsockopt(remote_fd, SOL_SOCKET, SO_SNDBUF, &sendbuffsize, optlen);
-
+    pthread_mutex_init(&pmp->mutex, NULL);
     return 0;
 }
 
@@ -548,8 +550,9 @@ mapped_pair_handler(int fd, int event, void *opaque)
     
     if (pmp->ref == 1) {
     
+        LOG_INFO("sockfd closed.[sockfd:%d] [pmp->ref == 1] ", fd);
         destroy_mapped_pair(fd, pmp);
-        return -1;
+        return 0;
     }
     read_fd = fd;
     if (pmp->remote_sockfd == fd) {
@@ -579,7 +582,7 @@ mapped_pair_handler(int fd, int event, void *opaque)
             
             LOG_INFO("sockfd closed.[sockfd:%d] [nrecv:%d] ", read_fd, nrecv);
             destroy_mapped_pair(read_fd, pmp);
-            return -1;
+            return 0;
         }
 
         //send
