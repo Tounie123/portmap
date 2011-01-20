@@ -16,13 +16,9 @@ portmap 主要是作为各个机器间端口映射的工具
   # make 
   # ./portmap  //启动进程
   # cd test    修改test1.c中相关变量
-   addr: portmap server的地址
-   port: portmap server 的端口
-   
-   request:是需要映射的地址和端口
-
-  # make && ./test1
-   正常情况下，会给你返回映射后的地址和端口
+    addr: portmap server的地址
+    port: portmap server 的端口
+    request:是需要映射的地址和端口
 {{{
 
     const char *addr = "10.60.1.124";
@@ -30,3 +26,5 @@ portmap 主要是作为各个机器间端口映射的工具
 
     const char *request = "10.60.1.124:5905";
 }}}
+  # make && ./test1
+   正常情况下，会给你返回映射后的地址和端口
